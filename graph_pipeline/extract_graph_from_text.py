@@ -3,6 +3,7 @@ import os
 from langchain_experimental.graph_transformers import LLMGraphTransformer
 from langchain_core.documents import Document
 from langchain_openai import ChatOpenAI
+from langchain_oci import ChatOCIGenAI
 import oracledb
 from typing import Iterable, List, Tuple, Any
 import re
@@ -140,12 +141,11 @@ def extract_graph_from_text(text: str, is_initial: bool):
     # Load the .env file
     load_dotenv()
 
-    # Get API key from environment variable (make sure the key is present in .env file in the project directory)
-    # In this case, we are using an OPENAI key, but any LLM API supported by LangChain will work
-    api_key = os.getenv("OPENAI_API_KEY")
-
     # Set LLM with temperature=0 (less room for creativity)
-    llm = ChatOpenAI(temperature=0, model_name="gpt-4o")
+    llm = ChatOCIGenAI(
+        model_id=os.getenv("OCI_LLM_MODEL_OCID"),
+        compartment_id=os.getenv("OCI_COMPARTMENT_OCID")
+    )
 
     # Instantiate LLMGraphTransformer to extract entities from the graph
     graph_transformer = LLMGraphTransformer(llm=llm)

@@ -1,6 +1,7 @@
 langchain_core==0.3.76
 langchain_experimental==0.3.4
 langchain_openai==0.3.33
+langchain_oci==0.1.5
 oci==2.150.1
 oracledb==3.3.0
 pandas==2.3.2
