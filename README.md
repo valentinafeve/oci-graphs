@@ -1,5 +1,5 @@
 # GraphRAG on Oracle 23ai
-_convert documents to a knowledge graph for natural language questions using Oracle Database 23ai_
+_convert documents to a knowledge graph for natural language questions using Oracle Database 23ai, Oracle GenAI Service and OpenAI's API
 
 A Streamlit app that:
 1) accepts a **.txt** or **.pdf** document,  
