@@ -7,6 +7,7 @@ import streamlit as st
 import pandas as pd
 import oracledb
 import oci
+from graph_pipeline.extract_graph_from_text import get_conn
 
 # ---------- Config ----------
 load_dotenv()
@@ -18,19 +19,11 @@ OCI_LLM_MODEL_OCID   = os.getenv("OCI_LLM_MODEL_OCID")       # text-generation m
 
 CONFIG_PROFILE = "DEFAULT"
 config = oci.config.from_file('~/.oci/config', CONFIG_PROFILE)
-endpoint = "https://inference.generativeai.us-ashburn-1.oci.oraclecloud.com"
+endpoint = "https://inference.generativeai.us-chicago-1.oci.oraclecloud.com"
 generative_ai_inference_client = oci.generative_ai_inference.GenerativeAiInferenceClient(config=config, service_endpoint=endpoint, retry_strategy=oci.retry.NoneRetryStrategy(), timeout=(10,240))
 chat_detail = oci.generative_ai_inference.models.ChatDetails()
 
 GRAPH_NAME = "document_pg"
-
-# ---------- DB helpers ----------
-@st.cache_resource(show_spinner=False)
-def get_conn():
-    # oracledb.init_oracle_client()  # if using Instant Client; else thin mode is fine without this
-    os.environ["TNS_ADMIN"] = "/Users/rrtasker/Oracle/network/admin"  # your wallet dir
-    return oracledb.connect(user=ORA_USER, password=ORA_PASS, dsn=ORA_DSN)
-    
 
 def run_query(sql: str, binds: dict | None = None) -> pd.DataFrame:
     conn = get_conn()

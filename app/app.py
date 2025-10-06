@@ -1,7 +1,7 @@
 import streamlit as st
 import io
 from pypdf import PdfReader
-from graph_pipeline.extract_graph_from_text import extract_graph_from_text
+from graph_pipeline.extract_graph_from_text import extract_graph_from_text, get_conn
 
 st.set_page_config(page_title="GraphRAG on Oracle 23ai", layout="wide")
 
@@ -38,6 +38,10 @@ uploaded_file = st.file_uploader(
     type=["pdf", "txt"],
     accept_multiple_files=False,
 )
+
+connection = get_conn()
+if connection:
+    st.toast("Connected to Oracle Database", icon="✅")
 
 if st.button("Run extraction"):
     if not uploaded_file:

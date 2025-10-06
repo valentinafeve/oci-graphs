@@ -1,0 +1,21 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Streamlit",
+      "type": "debugpy",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/app/",
+      "module": "streamlit",
+      "args": [
+        "run",
+        "app.py",
+        "--server.port",
+        "8501"
+      ],
+      "console": "integratedTerminal",
+      "python": "/opt/anaconda3/envs/ocigraphs/bin/python",
+      "envFile": "${workspaceFolder}/.env"  // ← aquí al path de tu .env
+    }
+  ]
+}

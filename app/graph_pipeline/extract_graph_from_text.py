@@ -8,6 +8,7 @@ import oracledb
 from typing import Iterable, List, Tuple, Any
 import re
 import asyncio
+from database.connection import get_conn
 
 # Extract entites from text
 async def extract_entities_from_text(text, graph_transformer):
@@ -115,10 +116,11 @@ def insert_into_oracle(nodes_out: List[Tuple[str, str]], edges_out: List[Tuple[s
 
             # Report any failed rows (e.g., FK violations)
             errs = cur.getbatcherrors()
-            for e in errs:
-                bad_row = edges_out[e.offset]     # the input row that failed
-                skipped.append((bad_row, e.message))
-                print(f"SKIPPED edge {bad_row} -> {e.message}")
+            if errs:
+                for e in errs:
+                    bad_row = edges_out[e.offset]     # the input row that failed
+                    skipped.append((bad_row, e.message))
+                    print(f"SKIPPED edge {bad_row} -> {e.message}")
 
             # Optional: how many actually inserted
             rowcounts = cur.getarraydmlrowcounts()
@@ -144,21 +146,13 @@ def extract_graph_from_text(text: str, is_initial: bool):
     # Set LLM with temperature=0 (less room for creativity)
     llm = ChatOCIGenAI(
         model_id=os.getenv("OCI_LLM_MODEL_OCID"),
-        compartment_id=os.getenv("OCI_COMPARTMENT_OCID")
+        service_endpoint="https://inference.generativeai.us-chicago-1.oci.oraclecloud.com",
+        compartment_id=os.getenv("OCI_COMPARTMENT_OCID"),
+
     )
 
     # Instantiate LLMGraphTransformer to extract entities from the graph
     graph_transformer = LLMGraphTransformer(llm=llm)
-
-    # Create Oracle Database 23ai connection 
-    ORA_USER = os.getenv("ORA_USER")
-    ORA_PASS = os.getenv("ORA_PASS")
-    ORA_DSN  = os.getenv("ORA_DSN")
-
-    def get_conn():
-        # oracledb.init_oracle_client()  # if using Instant Client; else thin mode is fine without this
-        os.environ["TNS_ADMIN"] = os.getenv("TNS_ADMIN")  # your wallet dir
-        return oracledb.connect(user=ORA_USER, password=ORA_PASS, dsn=ORA_DSN)
 
     conn = get_conn()
 
